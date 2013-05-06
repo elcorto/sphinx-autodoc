@@ -1,0 +1,66 @@
+Description
+-----------
+The script ``sphinx-autodoc`` is similar to ``sphinx-apidoc`` provided with
+Sphinx. It walkes thru a Python package and generates rst files for
+
+* full API doc (each module will be treated by ``autosummary``)
+* doc strings from modules 
+* detect and include hand written docu
+
+Using it is a 2-step process. First, run ``sphinx-quickstart``, then
+``sphinx-autodoc`` to generate all rst files .
+
+Usage
+-----
+Create a sphinx doc dir for your project (lets assume ``myproject/doc`` with
+the source dir ``myproject/doc/source`` and the main index file
+``myproject/source/doc/index.rst``)::
+    
+    $ cd myproject
+    $ sphinx-quickstart
+
+Choose a separate source and build dir (e.g. ``doc/source`` and ``doc/build``).
+Accept most other defaults. Especially, say yes to the "autodoc" extension.
+
+Now walk thru the package and create rst files. We use ``-i`` to create
+``source/index.rst``::
+
+    $ sphinx-autodoc -i -s doc/source myproject
+
+You can run the script from anywhere (no need to cd to the project dir). Only
+the source path ``-s`` must point to the dir where you want all rst files to 
+be generated.
+
+Now modify ``source/index.rst`` to suit you needs and then run ``make html``
+using the Sphinx-generated Makefile. Then watch the docu::
+
+    $ firefox -new-window build/html/index.html &
+
+Notes for numpydoc
+------------------
+If you want to use numpydoc and the numpy doc string format, then do this:
+
+Grab a copy of numpydoc. Note that users could install that as a separate
+package, but it is easier if we provide it with the code::
+    
+    ($ aptitude install python-setuptools)
+    $ mkdir doc/source/sphinxext
+    $ cd /tmp
+    $ easy_install --prefix doc numpydoc
+    $ cp -r doc/lib/python2.7/site-packages/numpydoc-0.4-py2.7.egg/numpydoc \
+      /path/to/pwtools/doc/source/sphinxext/
+
+Modify ``doc/source/conf.py`` to include numpydoc::
+
+    sys.path.insert(0, os.path.abspath('sphinxext'))
+    extensions = ['sphinx.ext.autodoc', 'sphinx.ext.coverage',
+                  'sphinx.ext.viewcode', 'sphinx.ext.autosummary',
+                  'numpydoc']
+
+Next, grab a recent copy of numpy and copy the ``class.rst`` file::
+
+    $ git clone ...
+    $ mkdir -p doc/source/_templates/autosummary
+    $ cp numpy/doc/source/_templates/autosummary/class.rst doc/source/_templates/autosummary 
+
+# vim:syn=rst
