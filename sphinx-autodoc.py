@@ -73,8 +73,8 @@ class Module(object):
         .. picks it up. We use automodule with :no-members: to render only the module
         .. doc string.
 
-        .. {fullbasename}
-        .. {bar}
+        {fullbasename}
+        {bar}
 
         .. automodule:: {name}
            :no-members:
