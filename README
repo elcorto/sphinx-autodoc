@@ -1,5 +1,6 @@
 Description
------------
+===========
+
 The script ``sphinx-autodoc`` is similar to ``sphinx-apidoc`` provided with
 Sphinx. It walkes thru a Python package and generates rst files for
 
@@ -11,7 +12,11 @@ Using it is a 2-step process. First, run ``sphinx-quickstart``, then
 ``sphinx-autodoc`` to generate all rst files .
 
 Usage
------
+=====
+
+Set up doc dir using ``sphinx-quickstart``
+------------------------------------------
+
 Create a sphinx doc dir for your project (lets assume ``myproject/doc`` with
 the source dir ``myproject/doc/source`` and the main index file
 ``myproject/source/doc/index.rst``)::
@@ -21,6 +26,19 @@ the source dir ``myproject/doc/source`` and the main index file
 
 Choose a separate source and build dir (e.g. ``doc/source`` and ``doc/build``).
 Accept most other defaults. Especially, say yes to the "autodoc" extension.
+
+Modify ``doc/source/conf.py`` to include these lines::
+
+    autodoc_default_flags = ['members', 'show-inheritance', 'special-members']
+    ##autodoc_default_flags = ['members']
+
+    autosummary_generate = True
+
+You may play with ``autodoc_default_flags``, but the important part is
+``autosummary_generate``.
+
+Use sphinx-autodoc
+------------------
 
 Now walk thru the package and create rst files. We use ``-i`` to create
 ``source/index.rst``::
@@ -36,19 +54,21 @@ using the Sphinx-generated Makefile. Then watch the docu::
 
     $ firefox -new-window build/html/index.html &
 
+
 Notes for numpydoc
-------------------
+==================
+
 If you want to use numpydoc and the numpy doc string format, then do this:
 
 Grab a copy of numpydoc. Note that users could install that as a separate
 package, but it is easier if we provide it with the code::
     
     ($ aptitude install python-setuptools)
-    $ mkdir doc/source/sphinxext
+    $ mkdir myproject/doc/source/sphinxext
     $ cd /tmp
     $ easy_install --prefix doc numpydoc
     $ cp -r doc/lib/python2.7/site-packages/numpydoc-0.4-py2.7.egg/numpydoc \
-      /path/to/pwtools/doc/source/sphinxext/
+      /path/to/myproject/doc/source/sphinxext/
 
 Modify ``doc/source/conf.py`` to include numpydoc::
 
