@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import importlib, inspect, pkgutil, os, optparse, shutil
-import textwrap
+import textwrap, re
 pj = os.path.join
 
 def backup(src, prefix='.'):
@@ -145,7 +145,7 @@ class Module(object):
                     break
     
     def write_api(self):
-        """source/generated/api/module.rst"""
+        """Write source/generated/apipath/module.rst"""
         txt = self.api_templ.format(members=format_names(self.members), 
                                     fullbasename=self.fullbasename,
                                     name=self.name, bar=self.bar)
@@ -154,7 +154,7 @@ class Module(object):
                       self.fullbasename) + '.rst', txt)
     
     def write_doc(self):
-        """source/generated/doc/module.rst"""
+        """Write source/generated/docpath/module.rst"""
         if self.has_doc:
             txt = self.doc_templ.format(fullbasename=self.fullbasename,
                                         name=self.name, bar=self.bar)
@@ -265,6 +265,10 @@ if __name__ == '__main__':
     parser.add_option('-i', '--write-index', action='store_true', 
                       help="""(over)write SOURCE/index.rst [%default]""", 
                       default=False)
+    parser.add_option('-X', '--exclude', 
+                      help="""regex for excluding modules, applied to the full
+                      module name [%default]""", 
+                      default=None)
     
     (opts, args) = parser.parse_args(sys.argv[1:])
     
@@ -274,6 +278,9 @@ if __name__ == '__main__':
     package = importlib.import_module(package_name)
     mods = [Module(name, source=opts.source, apipath=opts.apipath,
                    docpath=opts.docpath) for name in walk_package(package)]
+    if opts.exclude is not None:
+        rex = re.compile(opts.exclude)
+        mods = [mod for mod in mods if rex.search(mod.name) is None]
     modules_api = ''
     modules_doc = ''
     print "modules:"
