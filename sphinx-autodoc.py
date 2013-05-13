@@ -1,23 +1,59 @@
 #!/usr/bin/env python
 
-import importlib, inspect, pkgutil, os, optparse
+import importlib, inspect, pkgutil, os, optparse, shutil
 import textwrap
 pj = os.path.join
+
+def backup(src, prefix='.'):
+    """Backup (copy) `src` to <src><prefix><num>, where <num> is an integer
+    starting at 0 which is incremented until there is no destination with that
+    name.
+    
+    Symlinks are handled by shutil.copy() for files and shutil.copytree() for
+    dirs. In both cases, the content of the file/dir pointed to by the link is
+    copied.
+
+    Parameters
+    ----------
+    src : str
+        name of file/dir to be copied
+    prefix : str, optional
+    """
+    if os.path.isfile(src):
+        copy = shutil.copy 
+    elif os.path.isdir(src):
+        copy = shutil.copytree
+    else:
+        raise StandardError("source '%s' is not file or dir" %src)
+    idx = 0
+    dst = src + '%s%s' %(prefix,idx)
+    while os.path.exists(dst):
+        idx += 1
+        dst = src + '%s%s' %(prefix,idx)
+    # sanity check
+    if os.path.exists(dst):
+        raise StandardError("destination '%s' exists" %dst)
+    else:        
+        copy(src, dst)
+
 
 def file_write(fn, txt):
     fd = open(fn, 'w')
     fd.write(txt)
     fd.close()
 
+
 def format_name(name):
     """Prepend 3 wite spaces. Used for rst directive content formatting."""
     return '   %s' %name
+
 
 def format_names(names):
     txt = ''
     for nn in names:
         txt += '   %s\n' %nn
     return txt    
+
 
 def is_mod_member(name, obj, modname=None):
     """True if `obj` appears to be some kind of callable or class."""
@@ -261,5 +297,7 @@ if __name__ == '__main__':
         txt = index_templ.format(apipath=opts.apipath, docpath=opts.docpath,
                                  writtenpath=opts.writtenpath,
                                  package_name=package_name, bar=bar)
+        if os.path.exists(index_fn):
+            backup(index_fn)
         file_write(index_fn, txt)
 
