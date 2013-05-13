@@ -145,6 +145,7 @@ class Module(object):
                     break
     
     def write_api(self):
+        """source/generated/api/module.rst"""
         txt = self.api_templ.format(members=format_names(self.members), 
                                     fullbasename=self.fullbasename,
                                     name=self.name, bar=self.bar)
@@ -153,6 +154,7 @@ class Module(object):
                       self.fullbasename) + '.rst', txt)
     
     def write_doc(self):
+        """source/generated/doc/module.rst"""
         if self.has_doc:
             txt = self.doc_templ.format(fullbasename=self.fullbasename,
                                         name=self.name, bar=self.bar)
@@ -278,10 +280,10 @@ if __name__ == '__main__':
     for mod in mods:
         print("  %s" %mod.name)
         mod.write_api()
-        modules_api += format_name(mod.basename) + '\n'
+        modules_api += format_name(mod.fullbasename) + '\n'
         if mod.has_doc:
             mod.write_doc()
-            modules_doc += format_name(mod.basename) + '\n'
+            modules_doc += format_name(mod.fullbasename) + '\n'
     
     txt = api_index_templ.format(modules_api=modules_api)
     file_write(pj(opts.source, opts.apipath, 'index.rst'), txt)
