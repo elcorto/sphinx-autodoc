@@ -19,11 +19,19 @@ def format_names(names):
         txt += '   %s\n' %nn
     return txt    
 
-def is_mod_member(obj):
+def is_mod_member(name, obj, modname=None):
     """True if `obj` appears to be some kind of callable or class."""
-    return inspect.isfunction(obj) or \
-           inspect.isclass(obj) or \
-           hasattr(obj, '__call__')
+    # normal python module case
+    if (modname is not None) and hasattr(obj, '__module__'):
+        return (inspect.isfunction(obj) or \
+                inspect.isclass(obj) or \
+                hasattr(obj, '__call__')) and \
+                obj.__module__ == modname
+    # extension module (only f2py tested), very flaky test ...            
+    else:
+        return (not name.startswith('__')) and \
+               (not inspect.ismodule(obj)) and \
+                hasattr(obj, '__doc__')
 
 
 class Module(object):
@@ -89,17 +97,16 @@ class Module(object):
         self.sourcefile = inspect.getsourcefile(self.obj)
         self.members = \
             [x[0] for x in inspect.getmembers(self.obj) if \
-             is_mod_member(x[1]) and \
-             x[1].__module__ == self.name]    
-        
-        fh = open(self.sourcefile)
-        lines = fh.readlines()[:3]
-        fh.close()
+             is_mod_member(x[0], x[1], self.name)]
         self.has_doc = False
-        for ll in lines:
-            if ll.startswith('"""'):
-                self.has_doc = True
-                break
+        if self.sourcefile is not None:
+            fh = open(self.sourcefile)
+            lines = fh.readlines()[:3]
+            fh.close()
+            for ll in lines:
+                if ll.startswith('"""'):
+                    self.has_doc = True
+                    break
     
     def write_api(self):
         txt = self.api_templ.format(members=format_names(self.members), 
