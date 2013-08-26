@@ -41,9 +41,12 @@ Use sphinx-autodoc
 ------------------
 
 Now walk thru the package and create rst files. We use ``-i`` to create
-``source/index.rst``::
+an initial ``source/index.rst``::
 
     $ sphinx-autodoc -i -s doc/source myproject
+
+Note that this will overwrite an existing ``index.rst`` file (a backup is made
+however).
 
 You can run the script from anywhere (no need to cd to the project dir). Only
 the source path ``-s`` must point to the dir where you want all rst files to 

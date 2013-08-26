@@ -38,6 +38,8 @@ def backup(src, prefix='.'):
 
 
 def file_write(fn, txt):
+    if os.path.exists(fn):
+        backup(fn, prefix='.bak')
     fd = open(fn, 'w')
     fd.write(txt)
     fd.close()
@@ -306,7 +308,5 @@ if __name__ == '__main__':
         txt = index_templ.format(apipath=opts.apipath, docpath=opts.docpath,
                                  writtenpath=opts.writtenpath,
                                  package_name=package_name, bar=bar)
-        if os.path.exists(index_fn):
-            backup(index_fn)
         file_write(index_fn, txt)
 
