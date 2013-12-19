@@ -84,6 +84,5 @@ Next, grab a recent copy of numpy and copy the ``class.rst`` file::
 
     $ git clone ...
     $ mkdir -p doc/source/_templates/autosummary
-    $ cp numpy/doc/source/_templates/autosummary/class.rst doc/source/_templates/autosummary 
+    $ cp numpy/doc/source/_templates/autosummary/class.rst doc/source/_templates/autosummary/ 
 
-# vim:syn=rst
