@@ -1,15 +1,16 @@
 Description
 ===========
 
-The script ``sphinx-autodoc`` is similar to ``sphinx-apidoc`` provided with
+The script ``sphinx-autodoc.py`` is similar to ``sphinx-apidoc`` provided with
 Sphinx. It walkes thru a Python package and generates rst files for
 
 * full API doc (each module will be treated by ``autosummary``)
-* doc strings from modules 
+* doc strings from modules
 * detect and include hand written docu
 
-Using it is a 2-step process. First, run ``sphinx-quickstart``, then
-``sphinx-autodoc`` to generate all rst files .
+Using it is a 2-step process. First, run Sphinx' own ``sphinx-quickstart`` to
+set up a sphinx project, then ``sphinx-autodoc.py`` to generate all rst files .
+
 
 Usage
 =====
@@ -37,13 +38,14 @@ Modify ``doc/source/conf.py`` to include these lines::
 You may play with ``autodoc_default_flags``, but the important part is
 ``autosummary_generate``.
 
-Use sphinx-autodoc
-------------------
+
+Use sphinx-autodoc.py
+---------------------
 
 Now walk thru the package and create rst files. We use ``-i`` to create
 an initial ``source/index.rst``::
 
-    $ sphinx-autodoc -i -s doc/source myproject
+    $ sphinx-autodoc.py -i -s doc/source myproject
 
 Note that this will overwrite an existing ``index.rst`` file (a backup is made
 however).
@@ -63,8 +65,9 @@ Notes for numpydoc
 
 If you want to use numpydoc and the numpy doc string format, then do this:
 
-Grab a copy of numpydoc. Note that users could install that as a separate
-package, but it is easier if we provide it with the code::
+Grab a copy of numpydoc. Note that you could install that as a separate
+package, but this was not tested so far. We add the numpydoc files to the doc
+source ``myproject/doc/`` ::
     
     ($ aptitude install python-setuptools)
     $ mkdir myproject/doc/source/sphinxext
