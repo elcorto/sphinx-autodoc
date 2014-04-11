@@ -34,8 +34,6 @@ Accept most other defaults. Especially, say yes to the "autodoc" extension.
 Modify ``doc/source/conf.py`` to include these lines::
 
     autodoc_default_flags = ['members', 'show-inheritance', 'special-members']
-    ##autodoc_default_flags = ['members']
-
     autosummary_generate = True
 
 You may play with ``autodoc_default_flags``, but the important part is
@@ -69,18 +67,12 @@ Notes for numpydoc
 
 If you want to use numpydoc and the numpy doc string format, then do this:
 
-Grab a copy of numpydoc. Note that you could install that as a separate package
-(either from https://github.com/numpy/numpydoc or https://pypi.python.org/pypi/numpydoc),
-but this was not tested so far. We add the numpydoc files to the doc source
-``myproject/doc/`` ::
-    
-    ($ aptitude install python-setuptools)
-    $ mkdir myproject/doc/source/sphinxext
-    $ cd /tmp
-    $ easy_install --prefix doc numpydoc
-    # or git clone https://github.com/numpy/numpydoc.git
-    $ cp -r doc/lib/python2.7/site-packages/numpydoc-0.4-py2.7.egg/numpydoc \
-      /path/to/myproject/doc/source/sphinxext/
+Install numpydoc::
+
+    $ apt-get install python-numpydoc
+
+[or ``git clone https://github.com/numpy/numpydoc.git`` or
+https://pypi.python.org/pypi/numpydoc].
 
 Modify ``doc/source/conf.py`` to include numpydoc::
 
@@ -88,10 +80,17 @@ Modify ``doc/source/conf.py`` to include numpydoc::
     extensions = ['sphinx.ext.autodoc', 'sphinx.ext.coverage',
                   'sphinx.ext.viewcode', 'sphinx.ext.autosummary',
                   'numpydoc']
+    
+    numpydoc_show_class_members = True
+    numpydoc_class_members_toctree = True
+    
+    # for class.rst
+    templates_path = ['_templates']    
 
 Next, grab a recent copy of numpy and copy the ``class.rst`` file::
 
     $ git clone https://github.com/numpy/numpy.git
     $ mkdir -p doc/source/_templates/autosummary
     $ cp numpy/doc/source/_templates/autosummary/class.rst doc/source/_templates/autosummary/ 
+
 
