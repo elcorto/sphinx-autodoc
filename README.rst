@@ -7,9 +7,10 @@ Sphinx can create API documentation.
 
 It does this by walking thru a Python package and generating rst files for:
 
-* full API doc (each module will be treated by ``autosummary``)
-* doc strings from modules
-* detect and include hand written docu
+* Full API doc. Each module will be treated by ``autosummary``. Files are
+  written to ``source/generated/api`` by default. Module doc strings (if
+  present) are also included.
+* Detect and include hand written docu, by default in ``source/written/``.
 
 Using it is a 2-step process. First, run Sphinx' own ``sphinx-quickstart`` to
 set up a sphinx project (unless you already have one). Then
@@ -35,6 +36,10 @@ Modify ``doc/source/conf.py`` to include these lines::
 
     autodoc_default_flags = ['members', 'show-inheritance', 'special-members']
     autosummary_generate = True
+    modindex_common_prefix = ['pwtools.']
+    html_static_path = ['_static']          # may already be there
+    html_domain_indices = ['py-modindex']   # ignore np-modindex
+
 
 You may play with ``autodoc_default_flags``, but the important part is
 ``autosummary_generate``.

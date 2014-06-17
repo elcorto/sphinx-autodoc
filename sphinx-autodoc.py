@@ -86,22 +86,29 @@ class Module(object):
     """
     def __init__(self, name, source='source', apipath='generated/api',
                  docpath='generated/doc'):
-       
+        
+        # source/generated/api/module.rst
         self.api_templ = textwrap.dedent("""
         .. rst file which lists all members of the current module. They will be
         .. handled by the Sphinx autosummary extension.
 
         {fullbasename}
         {bar}
+        
+        .. Documentation string which may be at the top of the module.
+        .. automodule:: {name}
+           :no-members:
 
         .. currentmodule:: {name}
-
+        
+        .. Links to members.
         .. autosummary::
            :toctree:
            
         {members}
         """)
         
+        # source/generated/doc/module.rst
         self.doc_templ = textwrap.dedent("""
         .. rst file to pull only module doc strings at the top of the
         .. module file. These usually contain short tutorial-like stuff about what
@@ -147,7 +154,7 @@ class Module(object):
                     break
     
     def write_api(self):
-        """Write source/generated/apipath/module.rst"""
+        """Write source/apipath/module.rst"""
         txt = self.api_templ.format(members=format_names(self.members), 
                                     fullbasename=self.fullbasename,
                                     name=self.name, bar=self.bar)
@@ -156,7 +163,7 @@ class Module(object):
                       self.fullbasename) + '.rst', txt)
     
     def write_doc(self):
-        """Write source/generated/docpath/module.rst"""
+        """Write source/docpath/module.rst"""
         if self.has_doc:
             txt = self.doc_templ.format(fullbasename=self.fullbasename,
                                         name=self.name, bar=self.bar)
@@ -191,6 +198,8 @@ def walk_package(pkg, mod_names=[]):
 if __name__ == '__main__':
     
     import sys, optparse
+    
+    # source/generated/api/index.rst
     api_index_templ = textwrap.dedent("""
     .. generated API doc index file
 
@@ -203,6 +212,7 @@ if __name__ == '__main__':
     {modules_api}
     """)
     
+    # source/generated/doc/index.rst
     doc_index_templ = textwrap.dedent("""
     .. doc strings from modules index file
     
@@ -229,6 +239,7 @@ if __name__ == '__main__':
        {writtenpath}/index
     """)
     
+    # source/index.rst
     index_templ = textwrap.dedent("""
     {package_name}
     {bar}
@@ -249,24 +260,36 @@ if __name__ == '__main__':
         Arguments:
             package : The name of the package to walk (e.g 'scipy')
         """))
-
+    
     parser.add_option('-s', '--source', action='store',
                       help='sphinx source dir below which all rst files will \
                       be written [%default]', default='source')
     parser.add_option('-a', '--apipath', action='store',
-                      help="""dir for generated API rst files (relative to \
-                      SOURCE) [%default]""", default='generated/api')
+                      help="""dir (relative to SOURCE) for generated API rst
+                      files, written by default, may be
+                      turned off by --no-write-api [%default]""",
+                      default='generated/api')
     parser.add_option('-d', '--docpath', action='store',
-                      help="""dir for generated rst files for doc strings
-                      pulled from modules (relative to \
-                      SOURCE) [%default]""", default='generated/doc')
+                      help="""dir (relative to SOURCE) for extra generated rst
+                      files for doc strings pulled from modules, use with
+                      --write-doc, off by default [%default]""",
+                      default='generated/doc')
     parser.add_option('-w', '--writtenpath', action='store', 
-                      help="""dir for hand written rst files, an index.rst file
-                      must exist there (relative to \
-                      SOURCE) [%default]""", default='written')
+                      help="""dir (relative to SOURCE) for hand written rst
+                      files, an index.rst file must exist there, only needed
+                      with --write-index [%default]""",
+                      default='written')
     parser.add_option('-i', '--write-index', action='store_true', 
-                      help="""(over)write SOURCE/index.rst [%default]""", 
+                      help="""(over)write SOURCE/index.rst, not written by
+                      default""", 
                       default=False)
+    parser.add_option('', '--write-doc', action='store_true',
+                      help="""(over)write SOURCE/DOCPATH""", 
+                      default=False)
+    parser.add_option('', '--no-write-api', action='store_false',
+                      dest='write_api',
+                      help="""don't (over)write SOURCE/APIPATH""", 
+                      default=True)
     parser.add_option('-X', '--exclude', 
                       help="""regex for excluding modules, applied to the full
                       module name [%default]""", 
@@ -288,17 +311,20 @@ if __name__ == '__main__':
     print "modules:"
     for mod in mods:
         print("  %s" %mod.name)
-        mod.write_api()
-        modules_api += format_name(mod.fullbasename) + '\n'
-        if mod.has_doc:
+        if opts.write_api:
+            mod.write_api()
+            modules_api += format_name(mod.fullbasename) + '\n'
+        if opts.write_doc and mod.has_doc:
             mod.write_doc()
             modules_doc += format_name(mod.fullbasename) + '\n'
     
-    txt = api_index_templ.format(modules_api=modules_api)
-    file_write(pj(opts.source, opts.apipath, 'index.rst'), txt)
+    if opts.write_api:
+        txt = api_index_templ.format(modules_api=modules_api)
+        file_write(pj(opts.source, opts.apipath, 'index.rst'), txt)
 
-    txt = doc_index_templ.format(modules_doc=modules_doc)
-    file_write(pj(opts.source, opts.docpath, 'index.rst'), txt)
+    if opts.write_doc:
+        txt = doc_index_templ.format(modules_doc=modules_doc)
+        file_write(pj(opts.source, opts.docpath, 'index.rst'), txt)
     
     if opts.write_index:
         index_fn = pj(opts.source, 'index.rst')
