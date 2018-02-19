@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import importlib, inspect, pkgutil, os, optparse, shutil
 import textwrap, re
@@ -308,7 +308,7 @@ if __name__ == '__main__':
         mods = [mod for mod in mods if rex.search(mod.name) is None]
     modules_api = ''
     modules_doc = ''
-    print "modules:"
+    print("modules:")
     for mod in mods:
         print("  %s" %mod.name)
         if opts.write_api:
@@ -328,7 +328,7 @@ if __name__ == '__main__':
     
     if opts.write_index:
         index_fn = pj(opts.source, 'index.rst')
-        print "overwriting main index: %s" %index_fn
+        print("overwriting main index: %s" %index_fn)
         if os.path.exists(pj(opts.source, opts.writtenpath)):
             index_templ += written_index_templ
         txt = index_templ.format(apipath=opts.apipath, docpath=opts.docpath,
