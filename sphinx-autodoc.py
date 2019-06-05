@@ -20,11 +20,11 @@ def backup(src, prefix='.'):
     prefix : str, optional
     """
     if os.path.isfile(src):
-        copy = shutil.copy 
+        copy = shutil.copy
     elif os.path.isdir(src):
         copy = shutil.copytree
     else:
-        raise StandardError("source '%s' is not file or dir" %src)
+        raise Exception("source '%s' is not file or dir" %src)
     idx = 0
     dst = src + '%s%s' %(prefix,idx)
     while os.path.exists(dst):
@@ -32,8 +32,8 @@ def backup(src, prefix='.'):
         dst = src + '%s%s' %(prefix,idx)
     # sanity check
     if os.path.exists(dst):
-        raise StandardError("destination '%s' exists" %dst)
-    else:        
+        raise Exception("destination '%s' exists" %dst)
+    else:
         copy(src, dst)
 
 
