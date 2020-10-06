@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import importlib
 import inspect
 import optparse
@@ -204,8 +202,7 @@ def walk_package(pkg, mod_names=[]):
     return mod_names
 
 
-if __name__ == '__main__':
-
+def main():
     # source/generated/api/index.rst
     api_index_templ = textwrap.dedent("""
     .. generated API doc index file
