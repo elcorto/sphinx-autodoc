@@ -176,9 +176,9 @@ class Module(object):
         if self.has_doc:
             txt = self.doc_templ.format(fullbasename=self.fullbasename,
                                         name=self.name, bar=self.bar)
-        file_write(pj(self.source,
-                      self.docpath,
-                      self.fullbasename) + '.rst', txt)
+            file_write(pj(self.source,
+                          self.docpath,
+                          self.fullbasename) + '.rst', txt)
 
 
 def walk_package(pkg, mod_names=[]):
@@ -256,7 +256,7 @@ def main():
        :maxdepth: 1
 
        {apipath}/index
-       {docpath}/index
+       __docpath_index_entry__
     """)
 
     parser = optparse.OptionParser(
@@ -331,6 +331,11 @@ def main():
     if opts.write_doc:
         txt = doc_index_templ.format(modules_doc=modules_doc)
         file_write(pj(opts.source, opts.docpath, 'index.rst'), txt)
+        index_templ = re.sub("__docpath_index_entry__", "{docpath}/index",
+                index_templ)
+    else:
+        index_templ = re.sub("__docpath_index_entry__", "",
+                index_templ)
 
     if opts.write_index:
         index_fn = pj(opts.source, 'index.rst')
