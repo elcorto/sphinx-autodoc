@@ -47,9 +47,8 @@ def backup(src, prefix='.'):
 def file_write(fn, txt):
     if os.path.exists(fn):
         backup(fn, prefix='.bak')
-    fd = open(fn, 'w')
-    fd.write(txt)
-    fd.close()
+    with open(fn, "w") as fd:
+        fd.write(txt)
 
 
 def format_name(name):
@@ -79,7 +78,7 @@ def is_mod_member(name, obj, modname=None):
             and hasattr(obj, '__doc__')
 
 
-class Module(object):
+class Module:
     """Represent a module in a package and various formes of its name. Write
     RST files into a sphinx source path based on templates.
 
@@ -118,13 +117,16 @@ class Module(object):
 
         # source/generated/doc/module.rst
         self.doc_templ = textwrap.dedent("""
-        .. rst file to pull only module doc strings at the top of the
-        .. module file. These usually contain short tutorial-like stuff about what
-        .. can be done with the module's content.
+        .. rst file to pull only module doc strings at the top of the module
+        .. file. These usually contain short tutorial-like stuff about what can
+        .. be done with the module's content.
 
-        .. In each module doc string, create at least one heading such that sphinx
-        .. picks it up. We use automodule with :no-members: to render only the module
-        .. doc string.
+        .. In older sphinx versions, we needed to create at least one heading
+        .. in each module doc string such that sphinx picks it up. This doesn't
+        .. seem to be the case any longer.
+
+        .. We use automodule with :no-members: to render only the module doc
+        .. string.
 
         {fullbasename}
         {bar}
@@ -137,10 +139,6 @@ class Module(object):
         self.source = source
         self.apipath = apipath
         self.docpath = docpath
-        for p in [self.docpath, self.apipath]:
-            pp = pj(self.source, p)
-            if not os.path.exists(pp):
-                os.makedirs(pp)
         spl = self.name.split('.')
         self.pkgname = spl[0]
         self.basename = spl[-1]
@@ -154,9 +152,8 @@ class Module(object):
              is_mod_member(x[0], x[1], self.name)]
         self.has_doc = False
         if self.sourcefile is not None:
-            fh = open(self.sourcefile)
-            lines = fh.readlines()[:3]
-            fh.close()
+            with open(self.sourcefile) as fh:
+                lines = fh.readlines()[:3]
             for ll in lines:
                 if ll.startswith('"""'):
                     self.has_doc = True
@@ -305,15 +302,24 @@ def main():
 
     package_name = args[0]
     bar = '='*len(package_name)
+
     print("processing package: %s" %package_name)
     package = importlib.import_module(package_name)
     mods = [Module(name, source=opts.source, apipath=opts.apipath,
                    docpath=opts.docpath) for name in walk_package(package)]
+
     if opts.exclude is not None:
         rex = re.compile(opts.exclude)
         mods = [mod for mod in mods if rex.search(mod.name) is None]
+
     modules_api = ''
     modules_doc = ''
+
+    if opts.write_api:
+        os.makedirs(pj(opts.source, opts.apipath), exist_ok=True)
+    if opts.write_doc:
+        os.makedirs(pj(opts.source, opts.docpath), exist_ok=True)
+
     print("modules:")
     for mod in mods:
         print("  %s" %mod.name)
@@ -332,17 +338,18 @@ def main():
         txt = doc_index_templ.format(modules_doc=modules_doc)
         file_write(pj(opts.source, opts.docpath, 'index.rst'), txt)
         index_templ = re.sub("__docpath_index_entry__", "{docpath}/index",
-                index_templ)
+                             index_templ)
     else:
         index_templ = re.sub("__docpath_index_entry__", "",
-                index_templ)
+                             index_templ)
 
     if opts.write_index:
         index_fn = pj(opts.source, 'index.rst')
         print("overwriting main index: %s" %index_fn)
         if os.path.exists(pj(opts.source, opts.writtenpath)):
             index_templ += written_index_templ
-        txt = index_templ.format(apipath=opts.apipath, docpath=opts.docpath,
+        txt = index_templ.format(apipath=opts.apipath,
+                                 docpath=opts.docpath,
                                  writtenpath=opts.writtenpath,
                                  package_name=package_name, bar=bar)
         file_write(index_fn, txt)
