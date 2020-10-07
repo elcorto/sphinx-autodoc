@@ -105,6 +105,7 @@ class Module(object):
         .. Documentation string which may be at the top of the module.
         .. automodule:: {name}
            :no-members:
+           :no-inherited-members:
 
         .. currentmodule:: {name}
 
@@ -130,6 +131,7 @@ class Module(object):
 
         .. automodule:: {name}
            :no-members:
+           :no-inherited-members:
         """)
         self.name = name
         self.source = source
