@@ -9,3 +9,5 @@ dist/
 *.bak
 .eggs/
 __pycache__
+example_package/autodoctest/doc/build/
+example_package/autodoctest/doc/source/generated/
