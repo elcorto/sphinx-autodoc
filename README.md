@@ -39,13 +39,13 @@ Examples
 
 We provide a minimal, self-contained Python package with a doc dir for
 experimentation: `example_package/autodoctest`. In particular, check out
-`example_package/autodoctest/doc/generate-apidoc.sh`.
+`example_package/autodoctest/doc/generate-doc.sh`.
 
 ```sh
 $ cd example_package/autodoctest/
 $ pip install -e .
 $ cd doc
-$ ./generate-apidoc.sh
+$ ./generate-doc.sh
 $ firefox build/html/index.html
 ```
 
@@ -116,7 +116,7 @@ your `doc/source/_templates/autosummary/`.
 Use sphinx-autodoc
 ------------------
 
-tl;dr: See `example_package/autodoctest/doc/generate-apidoc.sh`
+tl;dr: See `example_package/autodoctest/doc/generate-doc.sh`
 
 
 Now walk thru the package and create rst files. We use `-i` to create an
