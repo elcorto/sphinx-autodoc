@@ -416,8 +416,14 @@ def main():
 
     if opts.write_index:
         index_fn = pj(opts.source, "index.rst")
+        w_pth = pj(opts.source, opts.writtenpath)
+        w_index_fn = pj(w_pth, "index.rst")
         print("overwriting main index: %s" % index_fn)
-        if os.path.exists(pj(opts.source, opts.writtenpath)):
+        if os.path.exists(w_pth):
+            assert os.path.exists(w_index_fn), (
+                f"trying to write {index_fn}: {w_pth} exists "
+                f"but {w_index_fn} not found"
+            )
             index_templ += written_index_templ
         txt = index_templ.format(
             apipath=opts.apipath,
