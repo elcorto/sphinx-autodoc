@@ -1,12 +1,11 @@
+import argparse
 import importlib
 import inspect
-import optparse
 import os
 import pkgutil
 import re
 import shutil
 import textwrap
-import sys
 
 pj = os.path.join
 
@@ -285,138 +284,132 @@ def main():
     """
     )
 
-    parser = optparse.OptionParser(
-        usage=textwrap.dedent(
-            """\
-        usage: %prog [options] <package>
+    parser = argparse.ArgumentParser()
 
-        Arguments:
-            package : The name of the package to walk (e.g 'scipy')
-        """
-        )
+    parser.add_argument(
+        "package", help="The name of the package to walk (e.g. 'scipy')"
     )
 
-    parser.add_option(
+    parser.add_argument(
         "-s",
         "--source",
         action="store",
-        help="sphinx source dir below which all rst files will \
-                      be written [%default]",
+        help="""sphinx source dir below which all rst files will
+                be written [%(default)s]""",
         default="source",
     )
-    parser.add_option(
+    parser.add_argument(
         "-a",
         "--apipath",
         action="store",
         help="""dir (relative to SOURCE) for generated API rst
-                      files, written by default, may be
-                      turned off by --no-write-api [%default]""",
+                files, written by default, may be
+                turned off by --no-write-api [%(default)s]""",
         default="generated/api",
     )
-    parser.add_option(
+    parser.add_argument(
         "-d",
         "--docpath",
         action="store",
         help="""dir (relative to SOURCE) for extra generated rst
-                      files for doc strings pulled from modules, use with
-                      --write-doc, off by default [%default]""",
+                files for doc strings pulled from modules, use with
+                --write-doc, off by default [%(default)s]""",
         default="generated/doc",
     )
-    parser.add_option(
+    parser.add_argument(
         "-w",
         "--writtenpath",
         action="store",
-        help="""dir (relative to SOURCE) for hand written rst
-                      files, an index.rst file must exist there, only needed
-                      with --write-index [%default]""",
+        help="""dir (relative to SOURCE) with hand written rst
+                files, an index.rst file must exist there, this will be added
+                to SOURCE/index.rst if found, only needed
+                with --write-index [%(default)s]""",
         default="written",
     )
-    parser.add_option(
+    parser.add_argument(
         "-i",
         "--write-index",
         action="store_true",
-        help="""(over)write SOURCE/index.rst, not written by
-                      default""",
+        help="""(over)write SOURCE/index.rst (a backup is made), not written by
+                default""",
         default=False,
     )
-    parser.add_option(
-        "",
+    parser.add_argument(
         "--write-doc",
         action="store_true",
         help="""(over)write SOURCE/DOCPATH""",
         default=False,
     )
-    parser.add_option(
-        "",
+    parser.add_argument(
         "--no-write-api",
         action="store_false",
         dest="write_api",
         help="""don't (over)write SOURCE/APIPATH""",
         default=True,
     )
-    parser.add_option(
+    parser.add_argument(
         "-X",
         "--exclude",
         help="""regex for excluding modules, applied to the full
-                      module name [%default]""",
+                module name [%(default)s]""",
         default=None,
     )
 
-    (opts, args) = parser.parse_args(sys.argv[1:])
+    args = parser.parse_args()
 
-    package_name = args[0]
+    package_name = args.package
     bar = "=" * len(package_name)
 
-    print("processing package: %s" % package_name)
+    print(f"processing package: {package_name}")
     package = importlib.import_module(package_name)
     mods = [
         Module(
             name,
-            source=opts.source,
-            apipath=opts.apipath,
-            docpath=opts.docpath,
+            source=args.source,
+            apipath=args.apipath,
+            docpath=args.docpath,
         )
         for name in walk_package(package)
     ]
 
-    if opts.exclude is not None:
-        rex = re.compile(opts.exclude)
+    if args.exclude is not None:
+        rex = re.compile(args.exclude)
         mods = [mod for mod in mods if rex.search(mod.name) is None]
 
     modules_api = ""
     modules_doc = ""
 
-    if opts.write_api:
-        os.makedirs(pj(opts.source, opts.apipath), exist_ok=True)
-    if opts.write_doc:
-        os.makedirs(pj(opts.source, opts.docpath), exist_ok=True)
+    if args.write_api:
+        os.makedirs(pj(args.source, args.apipath), exist_ok=True)
+    if args.write_doc:
+        os.makedirs(pj(args.source, args.docpath), exist_ok=True)
 
     print("modules:")
     for mod in mods:
         print("  %s" % mod.name)
-        if opts.write_api:
+        if args.write_api:
             mod.write_api()
             modules_api += format_name(mod.fullbasename) + "\n"
-        if opts.write_doc and mod.has_doc:
+        if args.write_doc and mod.has_doc:
             mod.write_doc()
             modules_doc += format_name(mod.fullbasename) + "\n"
 
-    if opts.write_api:
+    if args.write_api:
         txt = api_index_templ.format(modules_api=modules_api)
-        file_write(pj(opts.source, opts.apipath, "index.rst"), txt)
+        file_write(pj(args.source, args.apipath, "index.rst"), txt)
 
-    if opts.write_doc:
+    if args.write_doc:
         txt = doc_index_templ.format(modules_doc=modules_doc)
-        file_write(pj(opts.source, opts.docpath, "index.rst"), txt)
+        file_write(pj(args.source, args.docpath, "index.rst"), txt)
         index_templ = re.sub(
             "__docpath_index_entry__", "{docpath}/index", index_templ
         )
     else:
         index_templ = re.sub("__docpath_index_entry__", "", index_templ)
 
-    if opts.write_index:
-        index_fn = pj(opts.source, "index.rst")
-        w_pth = pj(opts.source, opts.writtenpath)
+    if args.write_index:
+        index_fn = pj(args.source, "index.rst")
+        w_pth = pj(args.source, args.writtenpath)
         w_index_fn = pj(w_pth, "index.rst")
         print("overwriting main index: %s" % index_fn)
         if os.path.exists(w_pth):
@@ -426,9 +419,9 @@ def main():
             )
             index_templ += written_index_templ
         txt = index_templ.format(
-            apipath=opts.apipath,
-            docpath=opts.docpath,
-            writtenpath=opts.writtenpath,
+            apipath=args.apipath,
+            docpath=args.docpath,
+            writtenpath=args.writtenpath,
             package_name=package_name,
             bar=bar,
         )
