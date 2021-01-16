@@ -52,14 +52,11 @@ def file_write(fn, txt):
 
 def format_name(name):
     """Prepend 3 wite spaces. Used for rst directive content formatting."""
-    return "   %s" % name
+    return f"   {name}"
 
 
 def format_names(names):
-    txt = ""
-    for nn in names:
-        txt += "   %s\n" % nn
-    return txt
+    return '\n'.join(f"   {nn}" for nn in names)
 
 
 def is_mod_member(name, obj, modname=None):
@@ -81,14 +78,13 @@ def is_mod_member(name, obj, modname=None):
 
 
 class Module:
-    """Represent a module in a package and various formes of its name. Write
+    """Represent a module in a package and various forms of its name. Write
     RST files into a sphinx source path based on templates.
 
     Notes
     -----
     Variable names and module related names:
 
-    source        = pkgname
     name          = pkgname.sub1.sub2.basename
     fullbasename  = sub1.sub2.basename
     """
@@ -101,7 +97,7 @@ class Module:
         docpath="generated/doc",
     ):
 
-        # source/generated/api/module.rst
+        # source/apipath/fullbasename.rst
         self.api_templ = textwrap.dedent(
             """
         .. rst file which lists all members of the current module. They will be
@@ -125,7 +121,7 @@ class Module:
         """
         )
 
-        # source/generated/doc/module.rst
+        # source/docpath/fullbasename.rst
         self.doc_templ = textwrap.dedent(
             """
         .. rst file to pull only module doc strings at the top of the module
@@ -147,6 +143,7 @@ class Module:
            :no-inherited-members:
         """
         )
+
         self.name = name
         self.source = source
         self.apipath = apipath
@@ -174,7 +171,7 @@ class Module:
                     break
 
     def write_api(self):
-        """Write source/apipath/module.rst"""
+        """Write source/apipath/fullbasename.rst"""
         txt = self.api_templ.format(
             members=format_names(self.members),
             fullbasename=self.fullbasename,
@@ -186,7 +183,7 @@ class Module:
         )
 
     def write_doc(self):
-        """Write source/docpath/module.rst"""
+        """Write source/docpath/fullbasename.rst"""
         if self.has_doc:
             txt = self.doc_templ.format(
                 fullbasename=self.fullbasename, name=self.name, bar=self.bar
@@ -222,7 +219,7 @@ def walk_package(pkg, mod_names=[]):
 
 
 def main():
-    # source/generated/api/index.rst
+    # source/apipath/index.rst
     api_index_templ = textwrap.dedent(
         """
     .. generated API doc index file
@@ -237,7 +234,7 @@ def main():
     """
     )
 
-    # source/generated/doc/index.rst
+    # source/docpath/index.rst
     doc_index_templ = textwrap.dedent(
         """
     .. doc strings from modules index file
@@ -386,7 +383,7 @@ def main():
 
     print("modules:")
     for mod in mods:
-        print("  %s" % mod.name)
+        print(f"  {mod.name}")
         if args.write_api:
             mod.write_api()
             modules_api += format_name(mod.fullbasename) + "\n"
@@ -411,7 +408,7 @@ def main():
         index_fn = pj(args.source, "index.rst")
         w_pth = pj(args.source, args.writtenpath)
         w_index_fn = pj(w_pth, "index.rst")
-        print("overwriting main index: %s" % index_fn)
+        print(f"overwriting main index: {index_fn}")
         if os.path.exists(w_pth):
             assert os.path.exists(w_index_fn), (
                 f"trying to write {index_fn}: {w_pth} exists "
