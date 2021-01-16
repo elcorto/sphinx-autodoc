@@ -12,7 +12,7 @@ def func(x=None):
     Parameters
     ----------
     x : array, optional
-        an array
+        Important numbers
 
     Returns
     -------
@@ -84,12 +84,15 @@ class Foo:
         Parameters
         ----------
         k : array
-            an array
+            Array with k values. This is going to be a longish explanation, so
+            we better come up with some non-trivial facts here! Let's hope this
+            is already enough. Oh, yes, also some rst math :math:`\int\sin(x)
+            dx` here, too.
 
         Returns
         -------
         x : float
-            a return value
+            accurately calculated stuff, scalar
         """
         return self.x
 
