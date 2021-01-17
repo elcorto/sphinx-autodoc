@@ -364,6 +364,13 @@ def main():
 
     print(f"processing package: {package_name}")
     package = importlib.import_module(package_name)
+
+    if args.exclude is not None:
+        rex = re.compile(args.exclude)
+        mod_filter = lambda name: rex.search(name) is None
+    else:
+        mod_filter = lambda name: True
+
     mods = [
         Module(
             name,
@@ -371,12 +378,8 @@ def main():
             apipath=args.apipath,
             docpath=args.docpath,
         )
-        for name in walk_package(package)
+        for name in walk_package(package) if mod_filter(name)
     ]
-
-    if args.exclude is not None:
-        rex = re.compile(args.exclude)
-        mods = [mod for mod in mods if rex.search(mod.name) is None]
 
     modules_api = ""
     modules_doc = ""
