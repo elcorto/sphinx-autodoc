@@ -10,7 +10,7 @@ import textwrap
 pj = os.path.join
 
 
-def backup(src, prefix="."):
+def _backup(src, prefix="."):
     """Backup (copy) `src` to <src><prefix><num>, where <num> is an integer
     starting at 0 which is incremented until there is no destination with that
     name.
@@ -43,9 +43,12 @@ def backup(src, prefix="."):
         copy(src, dst)
 
 
-def file_write(fn, txt):
+def file_write(fn, txt, backup=False):
     if os.path.exists(fn):
-        backup(fn, prefix=".bak")
+        if backup:
+            _backup(fn, prefix=".bak")
+        else:
+            raise Exception(f"file exists: {fn}")
     with open(fn, "w") as fd:
         fd.write(txt)
 
@@ -422,4 +425,4 @@ def main():
             package_name=package_name,
             bar=bar,
         )
-        file_write(index_fn, txt)
+        file_write(index_fn, txt, backup=True)
