@@ -1,0 +1,2 @@
+def index(foo):
+    pass

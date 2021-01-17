@@ -100,7 +100,7 @@ class Module:
         docpath="generated/doc",
     ):
 
-        # source/apipath/fullbasename.rst
+        # source/apipath/genname.rst
         self.api_templ = textwrap.dedent(
             """
         .. rst file which lists all members of the current module. They will be
@@ -124,7 +124,7 @@ class Module:
         """
         )
 
-        # source/docpath/fullbasename.rst
+        # source/docpath/genname.rst
         self.doc_templ = textwrap.dedent(
             """
         .. rst file to pull only module doc strings at the top of the module
@@ -156,6 +156,8 @@ class Module:
         self.basename = spl[-1]
         self.fullbasename = ".".join(spl[1:])
         self.bar = "=" * len(self.fullbasename)
+        self.genname = "__sphinx_autodoc_module__" + self.name
+
         self.obj = importlib.import_module(name)
         assert inspect.ismodule(self.obj)
         self.sourcefile = inspect.getsourcefile(self.obj)
@@ -174,7 +176,7 @@ class Module:
                     break
 
     def write_api(self):
-        """Write source/apipath/fullbasename.rst"""
+        """Write source/apipath/genname.rst"""
         txt = self.api_templ.format(
             members=format_names(self.members),
             fullbasename=self.fullbasename,
@@ -182,17 +184,17 @@ class Module:
             bar=self.bar,
         )
         file_write(
-            pj(self.source, self.apipath, self.fullbasename) + ".rst", txt
+            pj(self.source, self.apipath, self.genname) + ".rst", txt
         )
 
     def write_doc(self):
-        """Write source/docpath/fullbasename.rst"""
+        """Write source/docpath/genname.rst"""
         if self.has_doc:
             txt = self.doc_templ.format(
                 fullbasename=self.fullbasename, name=self.name, bar=self.bar
             )
             file_write(
-                pj(self.source, self.docpath, self.fullbasename) + ".rst", txt
+                pj(self.source, self.docpath, self.genname) + ".rst", txt
             )
 
 
@@ -389,10 +391,10 @@ def main():
         print(f"  {mod.name}")
         if args.write_api:
             mod.write_api()
-            modules_api += format_name(mod.fullbasename) + "\n"
+            modules_api += format_name(mod.genname) + "\n"
         if args.write_doc and mod.has_doc:
             mod.write_doc()
-            modules_doc += format_name(mod.fullbasename) + "\n"
+            modules_doc += format_name(mod.genname) + "\n"
 
     if args.write_api:
         txt = api_index_templ.format(modules_api=modules_api)
