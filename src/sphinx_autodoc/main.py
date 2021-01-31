@@ -313,9 +313,9 @@ def main():
         "-d",
         "--docpath",
         action="store",
-        help="""dir (relative to SOURCE) for extra generated rst
-                files for doc strings pulled from modules, use with
-                --write-doc, off by default [%(default)s]""",
+        help="""dir (relative to SOURCE) for extra generated rst files with
+                module doc strings in addition to having them in the API docs,
+                use with --write-doc, off by default [%(default)s]""",
         default="generated/doc",
     )
     parser.add_argument(
