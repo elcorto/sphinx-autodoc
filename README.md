@@ -1,5 +1,4 @@
-About
-=====
+# About
 
 `sphinx-autodoc` is almost, but not quite, entirely unlike `sphinx-apidoc`
 provided with Sphinx. It is a tool to automatically create `rst` source files,
@@ -10,8 +9,7 @@ This tool was created when `sphinx-apidoc` wasn't really around yet and later
 we never got it to work the way we wanted :) More on the differences between
 the two tools below.
 
-Features
---------
+# Features
 
 * Full API doc. Each module will be treated by the
   [`sphinx.ext.autosummary`][autosummary] extension. Files are written to
@@ -27,12 +25,11 @@ Features
   bases using the numpy docstring format. It works well in conjunction with the
   defaults that we implement and the recommended settings in Sphinx' `conf.py`.
 
-API docs generated with `sphinx-autodoc` can be found [here][imagecluster] or
-[here][pwtools].
+API docs generated with `sphinx-autodoc` can be found [here][imagecluster],
+[here][pwtools] or [here][psweep].
 
 
-Install
-=======
+# Install
 
 ```sh
 $ git clone ...
@@ -40,18 +37,22 @@ $ cd sphinx-autodoc
 $ pip install [-e] .
 ```
 
-Usage tl;dr
-===========
+# Usage tl;dr
 
 ```sh
 $ cd myproject/doc
 $ sphinx-autodoc myproject
+
+# Sphinx
 $ make html
 $ firefox build/html/index.html
+
+# jupyterbook
+##$ jb build source
+##$ firefox source/_build/html/index.html
 ```
 
-Options
-=======
+# Options
 
 ```
 usage: sphinx-autodoc [-h] [-s SOURCE] [-a APIPATH] [-d DOCPATH]
@@ -90,8 +91,7 @@ optional arguments:
                         module name [None]
 ```
 
-Examples
-========
+# Examples
 
 We provide a minimal, self-contained Python package with a doc dir for
 experimentation: `example_package/autodoctest`. In particular, check out
@@ -107,11 +107,28 @@ $ ./generate-doc.sh
 $ firefox build/html/index.html
 ```
 
-Usage
-=====
+# Usage
 
-Set up a doc dir using `sphinx-quickstart`
------------------------------------------
+## With [`jupyterbook`][jupyterbook]
+
+We recently started using jupyterbook instead of Sphinx directly and also
+played with the new `:recursive:` option of `sphinx.ext.autosummary`. Still
+API docs for each member end up on a single page. There [are ways to get
+around this by fiddling with
+templates](https://jupyterbook.org/en/stable/advanced/developers.html) but we
+ended up using `sphinx-autodoc` to generate API docs and pointing
+jupyterbook to the `generated/api/index.rst` file in `source/_toc.yml` was all
+we needed.
+
+Also we don't use `_templates/autosummary/class.rst`. Things still render
+fine, so this template may be obsolete.
+
+Check [this](https://github.com/elcorto/psweep/tree/master/doc) for how we use
+it, with only minor modifications to `generate-doc.sh`.
+
+## With Sphinx
+
+### Set up a doc dir using `sphinx-quickstart`
 
 If you haven't already, create a sphinx doc dir for your project (lets assume
 `myproject/doc` with the source dir `myproject/doc/source` and the main index
@@ -125,8 +142,8 @@ $ sphinx-quickstart
 Choose a separate source and build dir (e.g. `doc/source` and
 `doc/build`). Accept most other defaults.
 
-Configuration
--------------
+
+### Configuration
 
 Inspect `doc/source/conf.py` and make sure you have at least these
 extensions enabled.
@@ -162,8 +179,7 @@ autodoc_default_options = {
 See also `example_package/autodoctest/doc/source/conf.py`.
 
 
-Notes for numpydoc, class template
-----------------------------------
+### Notes for numpydoc, class template
 
 We used to use [numpydoc] and numpy's class template in the past. However, with
 recent Sphinx versions, the [napoleon] extension does a great job. Use our own
@@ -171,8 +187,8 @@ class template if you like in conjunction with that: copy
 `example_package/autodoctest/doc/source/_templates/autosummary/class.rst` to
 your `doc/source/_templates/autosummary/`.
 
-Use sphinx-autodoc
-------------------
+
+### Use sphinx-autodoc
 
 tl;dr: See `example_package/autodoctest/doc/generate-doc.sh`
 
@@ -200,8 +216,7 @@ rendered docs.
 $ firefox build/html/index.html
 ```
 
-Difference to `sphinx-apidoc`
-=============================
+# Difference to `sphinx-apidoc`
 
 The first difference is that `sphinx-apidoc` gets pointed to
 a *source tree*.
@@ -238,8 +253,7 @@ one page per member. We have found no way to do the same with Sphinx' own
 tools. If there is, ping me (email in `setup.py`) or send a PR against this
 file.
 
-`sphinx-apidoc`
----------------
+## `sphinx-apidoc`
 
 ```rst
 main module
@@ -251,8 +265,7 @@ main module
    :show-inheritance:
 ```
 
-`sphinx-autodoc`
-----------------
+## `sphinx-autodoc`
 
 ```rst
 .. rst file which lists all members of the current module. They will be
@@ -284,3 +297,5 @@ main
 [autosummary]: https://www.sphinx-doc.org/en/master/usage/extensions/autosummary.html
 [imagecluster]: https://elcorto.github.io/imagecluster/generated/api/
 [pwtools]: https://elcorto.github.io/pwtools/generated/api/
+[psweep]: https://github.com/elcorto/psweep
+[jupyterbook]: https://jupyterbook.org
