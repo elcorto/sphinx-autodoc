@@ -250,8 +250,7 @@ below.
 docs for the module end up on a single page. We automatically create
 `autosummary` directives and list all module members. This makes Sphinx create
 one page per member. We have found no way to do the same with Sphinx' own
-tools. If there is, ping me (email in `setup.py`) or send a PR against this
-file.
+tools. If there is, ping me or send a PR against this file.
 
 ## `sphinx-apidoc`
 
