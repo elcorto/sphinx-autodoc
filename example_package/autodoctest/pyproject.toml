@@ -1,0 +1,11 @@
+[project]
+name = "autodoctest"
+version = "1.2.3"
+authors = [
+    {name = "Gaylord Focker", email = "git@focker.com"}
+]
+
+
+[build-system]
+requires = ["setuptools>=66.1", "wheel"]
+build-backend = "setuptools.build_meta"
