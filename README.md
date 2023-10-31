@@ -40,14 +40,19 @@ $ pip install [-e] .
 # Usage tl;dr
 
 ```sh
-$ cd myproject/doc
+# Install your package since we need to import it
+$ cd /path/to/myproject
+$ pip install -e .
+
+# Call sphinx-autodoc, "myproject" is the package *name*
+$ cd /path/to/myproject/doc
 $ sphinx-autodoc myproject
 
-# Sphinx
+# Build docs with Sphinx
 $ make html
 $ firefox build/html/index.html
 
-# jupyterbook
+# Build docs with Jupyter Book
 ##$ jb build source
 ##$ firefox source/_build/html/index.html
 ```
@@ -109,19 +114,18 @@ $ firefox build/html/index.html
 
 # Usage
 
-## With [`jupyterbook`][jupyterbook]
+## With [`Jupyter Book`][jupyterbook]
 
-We recently started using jupyterbook instead of Sphinx directly and also
+We recently started using Jupyter Book instead of Sphinx directly and also
 played with the new `:recursive:` option of `sphinx.ext.autosummary`. Still
 API docs for each member end up on a single page. There [are ways to get
 around this by fiddling with
 templates](https://jupyterbook.org/en/stable/advanced/developers.html) but we
-ended up using `sphinx-autodoc` to generate API docs and pointing
-jupyterbook to the `generated/api/index.rst` file in `source/_toc.yml` was all
-we needed.
+ended up using `sphinx-autodoc` to generate API docs and pointed
+Jupyter Book to the `generated/api/index.rst` file in `source/_toc.yml`.
 
-Also we don't use `_templates/autosummary/class.rst`. Things still render
-fine, so this template may be obsolete.
+Also we don't use `_templates/autosummary/class.rst` in this case. Things still
+render fine, so this template may be obsolete.
 
 Check [this](https://github.com/elcorto/psweep/tree/main/doc) for how we use
 it, with only minor modifications to `generate-doc.sh`.
