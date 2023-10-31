@@ -123,7 +123,7 @@ we needed.
 Also we don't use `_templates/autosummary/class.rst`. Things still render
 fine, so this template may be obsolete.
 
-Check [this](https://github.com/elcorto/psweep/tree/master/doc) for how we use
+Check [this](https://github.com/elcorto/psweep/tree/main/doc) for how we use
 it, with only minor modifications to `generate-doc.sh`.
 
 ## With Sphinx
